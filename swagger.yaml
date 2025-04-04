@@ -1,0 +1,463 @@
+swagger: '2.0'
+info:
+    title: Bank Argent API documentation
+    description: Contains all available API endpoints in this codebase
+    version: '1.0.0'
+    termsOfService: 'http://swagger.io/terms/'
+host: localhost:3001
+basePath: /api/v1
+schemes:
+    - http
+paths:
+    /user/login:
+        post:
+            tags:
+                - User Module
+            summary: Login
+            description: API for Login
+            parameters:
+                - in: body
+                  name: body
+                  description: Login Payload
+                  required: true
+                  schema:
+                      $ref: '#/definitions/Login'
+            produces:
+                - application/json
+            responses:
+                '200':
+                    description: Login Successfully
+                    schema:
+                        $ref: '#/definitions/LoginResponse'
+                '400':
+                    description: Invalid Fields
+                '500':
+                    description: Internal Server Error
+    /user/signup:
+        post:
+            tags:
+                - User Module
+            summary: Signup
+            description: API for Signup
+            parameters:
+                - in: body
+                  name: body
+                  description: Signup Payload
+                  required: true
+                  schema:
+                      $ref: '#/definitions/User'
+            produces:
+                - application/json
+            responses:
+                '200':
+                    description: Signup Successfully
+                    schema:
+                        $ref: '#/definitions/ApiResponse'
+                '400':
+                    description: Invalid Fields
+                '500':
+                    description: Internal Server Error
+    /user/profile:
+        post:
+            security:
+                - Bearer: []
+            tags:
+                - User Module
+            summary: User Profile API
+            description: API for fetching a user profile
+            parameters:
+                - in: header
+                  name: Authorization
+                  description: Attach Bearer JWT token
+                  required: true
+                  type: string
+            produces:
+                - application/json
+            responses:
+                '200':
+                    description: User profile retrieved successully
+                    schema:
+                        $ref: '#/definitions/ApiResponse'
+                '400':
+                    description: Invalid Fields
+                '500':
+                    description: Internal Server Error
+        put:
+            security:
+                - Bearer: []
+            tags:
+                - User Module
+            summary: User Profile API
+            description: API for updating a user profile
+            parameters:
+                - in: header
+                  name: Authorization
+                  description: Attach Bearer JWT token
+                  required: true
+                  type: string
+                - in: body
+                  name: body
+                  description: Update user profile attributes
+                  required: true
+                  schema:
+                      $ref: '#/definitions/UserProfile'
+            produces:
+                - application/json
+            responses:
+                '200':
+                    description: User profile retrieved successully
+                    schema:
+                        $ref: '#/definitions/ApiResponse'
+                '400':
+                    description: Invalid Fields
+                '500':
+                    description: Internal Server Error
+    /user/accounts:
+        get:
+            security:
+                - Bearer: []
+            summary: récupérer les comptes de l'utilisateur
+            parameters:
+                - in: header
+                  name: Authorization
+                  description: Attach Bearer JWT token
+                  required: true
+                  type: string
+            produces:
+                - application/json
+            responses:
+                '200':
+                    description: les comptes sont récupérés avec succès
+                    schema:
+                        type: array
+                        items:
+                            type: object
+                            properties:
+                                accountId:
+                                    type: string
+                                name:
+                                    type: string
+                                balance:
+                                    type: number
+                                type:
+                                    type: string
+                    examples:
+                        application/json:
+                            - accountId: '1'
+                              name: 'Argent Bank Checking'
+                              balance: 2082.79
+                              type: 'Available Balance'
+                            - accountId: '2'
+                              name: 'Argent Bank Savings'
+                              balance: 10928.42
+                              type: 'Available Balance'
+                            - accountId: '3'
+                              name: 'Argent Bank Credit Card'
+                              balance: 184.30
+                              type: 'Current Balance'
+                '400':
+                    description: Invalid Fields
+                '500':
+                    description: Internal Server Error
+    /user/accounts/{accountId}/transactions:
+        get:
+            summary: Récupère toutes les transactions d'un compte pour le mois en cours
+            security:
+                - Bearer: []
+            parameters:
+                - in: header
+                  name: Authorization
+                  description: Attach Bearer JWT token
+                  required: true
+                  type: string
+                - name: accountId
+                  in: path
+                  required: true
+                  type: string
+                - name: month
+                  in: query
+                  required: false
+                  type: string
+            responses:
+                '200':
+                    description: les transactions du compte sont récupérées avec succès
+                    schema:
+                        type: array
+                        items:
+                            type: object
+                            properties:
+                                transactionId:
+                                    type: string
+                                date:
+                                    type: string
+                                description:
+                                    type: string
+                                amount:
+                                    type: number
+                                balance:
+                                    type: number
+                    examples:
+                        application/json:
+                            - transactionId: '1'
+                              date: '2020-06-20'
+                              description: 'Golden Sun Bakery'
+                              amount: 5.00
+                              balance: 2082.86
+                            - transactionId: '2'
+                              date: '2020-06-21'
+                              description: 'Amazon Marketplace'
+                              amount: 50.00
+                              balance: 2032.86
+                '400':
+                    description: Invalid Fields
+                '500':
+                    description: Internal Server Error
+        post:
+            summary: Créer une nouvelle transaction pour un compte
+            security:
+                - Bearer: []
+            parameters:
+                - in: header
+                  name: Authorization
+                  required: true
+                  type: string
+                - name: accountId
+                  in: path
+                  required: true
+                  type: string
+                - in: body
+                  name: body
+                  required: true
+                  description: Données de la nouvelle transaction
+                  schema:
+                      type: object
+                      properties:
+                          transactionId:
+                              type: string
+                              example: '1234'
+                          date:
+                              type: string
+                              example: '2023-10-05'
+                          description:
+                              type: string
+                              example: 'Supermarket'
+                          amount:
+                              type: number
+                              example: 45.50
+                          category:
+                              type: string
+                              example: 'alimentation'
+                          type:
+                              type: string
+                              example: 'alimentations '
+                          note:
+                              type: string
+                              example: 'Courses hebdomadaires'
+            responses:
+                '200':
+                    description: 'Transaction créée avec succès'
+                    schema:
+                        $ref: '#/definitions/Transaction'
+                '400':
+                    description: Invalid Fields
+                '500':
+                    description: Internal Server Error
+    /user/accounts/{accountId}/transactions/{transactionId}:
+        get:
+            summary: Récupère une transaction spécifique d'un compte
+            security:
+                - Bearer: []
+            parameters:
+                - in: header
+                  name: Authorization
+                  description: Attach Bearer JWT token
+                  required: true
+                  type: string
+                - name: accountId
+                  in: path
+                  required: true
+                  type: string
+                - name: transactionId
+                  in: path
+                  required: true
+                  type: string
+            produces:
+                - application/json
+            responses:
+                '200':
+                    description: Transaction récupérée avec succès
+                    schema:
+                        type: object
+                        properties:
+                            transactionId:
+                                type: string
+                            date:
+                                type: string
+                            description:
+                                type: string
+                            amount:
+                                type: number
+                            balance:
+                                type: number
+                            category:
+                                type: string
+                            type:
+                                type: string
+                            note:
+                                type: string
+                    examples:
+                        application/json:
+                            transactionId: '2'
+                            date: '2020-06-20'
+                            description: 'Golden Sun Bakery'
+                            amount: 5.00
+                            balance: 2082.86
+                            category: 'Shopping'
+                            type: 'Electronic'
+                            note: 'Achat promotionnel sur Amazon'
+                '400':
+                    description: Invalid Fields
+                '500':
+                    description: Internal Server Error
+    /user/accounts/{accountId}/transactions/{transactionId}/category:
+        patch:
+            summary: Mette à jour la catégorie d'une transaction
+            security:
+                - Bearer: []
+            parameters:
+                - in: header
+                  name: Authorization
+                  required: true
+                  type: string
+                - name: accountId
+                  in: path
+                  required: true
+                  type: string
+                - name: transactionId
+                  in: path
+                  required: true
+                  type: string
+                - in: body
+                  name: body
+                  required: true
+                  schema:
+                      type: object
+                      properties:
+                          category:
+                              type: string
+                              example: 'Food'
+            responses:
+                '200':
+                    description: Catégorie mise à jour avec succès
+                '400':
+                    description: Invalid Fields
+                '500':
+                    description: Internal Server Error
+    /user/accounts/{accountId}/transactions/{transactionId}/note:
+        patch:
+            summary: Mettre à jour de la note d'une transaction
+            security:
+                - Bearer: []
+            parameters:
+                - in: header
+                  name: Authorization
+                  required: true
+                  type: string
+                - name: accountId
+                  in: path
+                  required: true
+                  type: string
+                - name: transactionId
+                  in: path
+                  required: true
+                  type: string
+                - in: body
+                  name: body
+                  required: true
+                  schema:
+                      type: object
+                      properties:
+                          note:
+                              type: string
+                              example: 'mise à jours'
+            responses:
+                '200':
+                    description: Note mise à jour avec succès
+                '400':
+                    description: Invalid Fields
+                '500':
+                    description: Internal Server Error
+securityDefinitions:
+    Bearer:
+        type: apiKey
+        name: Authorization
+        in: header
+definitions:
+    User:
+        properties:
+            email:
+                type: string
+                description: user email
+            password:
+                type: string
+                description: user password
+            firstName:
+                type: string
+                description: user first name
+            lastName:
+                type: string
+                description: user last name
+    Login:
+        properties:
+            email:
+                type: string
+                description: user email
+            password:
+                type: string
+                description: user password
+    ApiResponse:
+        type: object
+        properties:
+            status:
+                type: integer
+            message:
+                type: string
+            body:
+                type: object
+                properties:
+                    id:
+                        type: string
+                    email:
+                        type: string
+    LoginResponse:
+        type: object
+        properties:
+            token:
+                type: string
+    UserProfile:
+        type: object
+        properties:
+            firstName:
+                type: string
+            lastName:
+                type: string
+    Transaction:
+        type: object
+        properties:
+            transactionId:
+                type: string
+            date:
+                type: string
+                format: date
+            description:
+                type: string
+            amount:
+                type: number
+            balance:
+                type: number
+            category:
+                type: string
+            type:
+                type: string
+            note:
+                type: string
